@@ -42,43 +42,32 @@ def analyze_tabs():
     goal = str(data.get("goal", "")).strip()
     tabs = data.get("tabs", [])
 
-    # Validate user input
     if not goal:
-        return jsonify({
-            "error": "Please enter your research goal."
-        }), 400
+        return jsonify({"error": "Please enter your research goal."}), 400
 
     if not isinstance(tabs, list) or not tabs:
-        return jsonify({
-            "error": "No browser tabs were received."
-        }), 400
+        return jsonify({"error": "No browser tabs were received."}), 400
 
     api_key = os.environ.get("GEMINI_API_KEY")
 
     if not api_key:
-        return jsonify({
-            "error": "Gemini API key is not configured."
-        }), 500
+        return jsonify({"error": "Gemini API key is not configured."}), 500
 
-    # Clean and validate browser tabs
     clean_tabs = []
 
     for tab in tabs[:MAX_TABS]:
-
         try:
             tab_id = int(tab["id"])
 
             if tab_id <= 0:
                 continue
 
+            url = str(tab.get("url", ""))[:500]
+
             clean_tabs.append({
                 "id": tab_id,
-                "title": str(
-                    tab.get("title", "Untitled")
-                )[:200],
-                "url": str(
-                    tab.get("url", "")
-                )[:500],
+                "title": str(tab.get("title", "Untitled"))[:200],
+                "url": url,
                 "content": str(
                     tab.get("content", "")
                 )[:MAX_CONTENT_LENGTH]
@@ -88,14 +77,11 @@ def analyze_tabs():
             continue
 
     if not clean_tabs:
-        return jsonify({
-            "error": "No valid browser tabs were received."
-        }), 400
+        return jsonify({"error": "No valid browser tabs were received."}), 400
 
     # Prepare AI instructions
     prompt = f"""
-You are TabMind, an advanced AI browser research
-and productivity assistant.
+You are TabMind, an intelligent browser research assistant.
 
 USER'S RESEARCH GOAL:
 {goal}
@@ -103,44 +89,35 @@ USER'S RESEARCH GOAL:
 BROWSER TABS AND EXTRACTED WEBPAGE CONTENT:
 {json.dumps(clean_tabs, ensure_ascii=False)}
 
-YOUR RESPONSIBILITIES:
+ANALYSIS RULES:
 
-1. Understand the user's research goal.
-2. Analyse the actual extracted webpage content.
-3. Identify webpages relevant to the user's goal.
-4. Identify unrelated and distracting webpages.
-5. Return distracting tab IDs using their original IDs.
-6. Identify important facts, concepts and information.
-7. Generate exactly FIVE useful research insights.
-8. Identify knowledge gaps and suggest useful
-   research directions within the five insights.
-9. Avoid repeating the same information.
-10. Never invent facts or claim to have visited
-    webpages that were not provided.
-11. If content is unavailable, cautiously use
-    the webpage title and URL.
-
-IMPORTANT:
-- Only return IDs belonging to the provided tabs.
-- Do not recommend closing relevant research tabs.
-- Be accurate and useful.
-- Return exactly five concise insights.
+1. Analyse the actual webpage content.
+2. Identify tabs relevant to the user's goal.
+3. Identify genuinely unrelated or distracting tabs.
+4. Never classify TabMind's own website or dashboard as distractions.
+5. Never classify localhost or 127.0.0.1 development pages as distractions.
+6. Never classify browser settings or extension pages as distractions.
+7. Do not recommend closing important research pages.
+8. Return only distracting tab IDs from the supplied tabs.
+9. Generate exactly FIVE useful research insights.
+10. Avoid repeating information.
+11. Never invent facts.
+12. If webpage content is unavailable, use its title and URL cautiously.
 
 RETURN VALID JSON ONLY:
 
 {{
     "distracting_tab_ids": [],
     "summary_bullets": [
-        "Research insight 1",
-        "Research insight 2",
-        "Research insight 3",
-        "Research insight 4",
-        "Research insight 5"
+        "Insight 1",
+        "Insight 2",
+        "Insight 3",
+        "Insight 4",
+        "Insight 5"
     ]
 }}
 """
 
-    # Gemini API request
     api_url = (
         "https://generativelanguage.googleapis.com/v1beta/"
         f"models/{GEMINI_MODEL}:generateContent"
@@ -174,20 +151,12 @@ RETURN VALID JSON ONLY:
 
         api_response = None
 
-        # Retry temporary server overloads
         for attempt in range(4):
-
             try:
-
-                with urllib.request.urlopen(
-                    req,
-                    timeout=90
-                ) as response:
-
+                with urllib.request.urlopen(req, timeout=90) as response:
                     api_response = json.loads(
                         response.read().decode("utf-8")
                     )
-
                 break
 
             except urllib.error.HTTPError as error:
@@ -202,37 +171,20 @@ RETURN VALID JSON ONLY:
                     error_details
                 )
 
-                # Retry temporary server errors
                 if error.code == 503 and attempt < 3:
-
                     wait_time = 2 ** (attempt + 1)
-
-                    print(
-                        f"Gemini busy. Retrying in "
-                        f"{wait_time} seconds..."
-                    )
-
+                    print(f"Gemini busy. Retrying in {wait_time} seconds...")
                     time.sleep(wait_time)
                     continue
 
                 if error.code == 429:
-
                     return jsonify({
-                        "error": (
-                            "Gemini API request limit reached. "
-                            "Please wait before trying again."
-                        ),
-                        "details": error_details
+                        "error": "Gemini API request limit reached. Please wait."
                     }), 429
 
                 if error.code == 503:
-
                     return jsonify({
-                        "error": (
-                            "Gemini is temporarily overloaded. "
-                            "Please try again later."
-                        ),
-                        "details": error_details
+                        "error": "Gemini is temporarily overloaded. Please try again."
                     }), 503
 
                 return jsonify({
@@ -241,12 +193,8 @@ RETURN VALID JSON ONLY:
                 }), 502
 
         if api_response is None:
+            return jsonify({"error": "Gemini did not return a response."}), 502
 
-            return jsonify({
-                "error": "Gemini did not return a response."
-            }), 502
-
-        # Extract AI response
         result_text = (
             api_response["candidates"][0]
             ["content"]["parts"][0]["text"]
@@ -254,14 +202,8 @@ RETURN VALID JSON ONLY:
 
         result = json.loads(result_text)
 
-        # Validate AI response
-        distraction_ids = result.get(
-            "distracting_tab_ids", []
-        )
-
-        summary = result.get(
-            "summary_bullets", []
-        )
+        distraction_ids = result.get("distracting_tab_ids", [])
+        summary = result.get("summary_bullets", [])
 
         if not isinstance(distraction_ids, list):
             distraction_ids = []
@@ -269,15 +211,29 @@ RETURN VALID JSON ONLY:
         if not isinstance(summary, list):
             summary = []
 
-        valid_ids = {
-            tab["id"] for tab in clean_tabs
-        }
+        valid_ids = {tab["id"] for tab in clean_tabs}
 
         distraction_ids = [
             int(tab_id)
             for tab_id in distraction_ids
             if str(tab_id).isdigit()
             and int(tab_id) in valid_ids
+        ]
+
+        # Safety filter: never recommend closing local or TabMind pages.
+        safe_tabs = {
+            tab["id"]: tab
+            for tab in clean_tabs
+        }
+
+        distraction_ids = [
+            tab_id
+            for tab_id in distraction_ids
+            if not (
+                "localhost" in safe_tabs[tab_id]["url"].lower()
+                or "127.0.0.1" in safe_tabs[tab_id]["url"].lower()
+                or "tabmind" in safe_tabs[tab_id]["url"].lower()
+            )
         ]
 
         summary = [
@@ -287,15 +243,10 @@ RETURN VALID JSON ONLY:
         ]
 
         if len(summary) != 5:
-
             return jsonify({
-                "error": (
-                    "AI did not generate exactly five "
-                    "research insights. Please try again."
-                )
+                "error": "AI did not generate exactly five research insights."
             }), 502
 
-        # Remove webpage text before returning or storing
         display_tabs = [
             {
                 "id": tab["id"],
@@ -321,10 +272,7 @@ RETURN VALID JSON ONLY:
         print("Network error:", str(error))
 
         return jsonify({
-            "error": (
-                "Unable to connect to Gemini. "
-                "Check your internet connection."
-            )
+            "error": "Unable to connect to Gemini. Check your internet connection."
         }), 502
 
     except (KeyError, IndexError, TypeError, ValueError) as error:
@@ -332,10 +280,7 @@ RETURN VALID JSON ONLY:
         print("Invalid Gemini response:", str(error))
 
         return jsonify({
-            "error": (
-                "Gemini returned an unexpected response. "
-                "Please try again."
-            )
+            "error": "Gemini returned an unexpected response. Please try again."
         }), 502
 
     except Exception as error:
@@ -352,7 +297,6 @@ RETURN VALID JSON ONLY:
 def get_latest_analysis():
 
     if latest_analysis is None:
-
         return jsonify({
             "message": "No analysis has been performed yet."
         })
