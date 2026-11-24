@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TabMind - AI Focus Assistant</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🧠</span>
+            <span>TabMind</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How it works</a>
+            <a href="#dashboard">Dashboard</a>
+        </div>
+
+        <a href="#dashboard" class="nav-button">Get Started ↗</a>
+    </nav>
+
+
+    <header class="hero">
+
+        <div class="hero-content">
+
+            <div class="badge">
+                ✨ AI-POWERED PRODUCTIVITY
+            </div>
+
+            <h1>
+                Your tabs.<br>
+                Your focus.<br>
+                <span>Your smartest workspace.</span>
+            </h1>
+
+            <p>
+                Too many tabs? Too many distractions?
+                Let TabMind use AI to organise your browsing,
+                identify distractions and turn your research
+                into meaningful insights.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="#dashboard" class="primary-button">
+                    Explore Dashboard →
+                </a>
+
+                <a href="#how-it-works" class="secondary-button">
+                    How it works
+                </a>
+            </div>
+
+            <div class="hero-stats">
+                <div>
+                    <h3>AI</h3>
+                    <p>Powered Analysis</p>
+                </div>
+
+                <div>
+                    <h3>5</h3>
+                    <p>Research Insights</p>
+                </div>
+
+                <div>
+                    <h3>1</h3>
+                    <p>Focused Workspace</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="hero-visual">
+            <div class="brain-circle">🧠</div>
+
+            <div class="floating-card card-one">
+                <span>🎯</span>
+                <div>
+                    <strong>Focus detected</strong>
+                    <small>Stay on your goal</small>
+                </div>
+            </div>
+
+            <div class="floating-card card-two">
+                <span>✨</span>
+                <div>
+                    <strong>AI Analysis</strong>
+                    <small>Your tabs, organised</small>
+                </div>
+            </div>
+
+            <div class="floating-card card-three">
+                <span>📚</span>
+                <div>
+                    <strong>Smart Research</strong>
+                    <small>5 key insights</small>
+                </div>
+            </div>
+        </div>
+
+    </header>
+
+
+    <section class="features" id="features">
+
+        <div class="section-heading">
+            <span class="section-label">WHAT MAKES TABMIND SPECIAL</span>
+            <h2>Browse smarter, not harder.</h2>
+            <p>Everything you need to turn browser chaos into productivity.</p>
+        </div>
+
+        <div class="feature-grid">
+
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Smart Focus</h3>
+                <p>Tell TabMind your goal and let AI identify tabs that distract you.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🧠</div>
+                <h3>AI Tab Analysis</h3>
+                <p>Understand which open tabs are relevant to your current task.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📚</div>
+                <h3>Research Summary</h3>
+                <p>Convert your relevant browsing research into five useful insights.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Distraction Control</h3>
+                <p>Review distracting tabs and choose which ones you want to close.</p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="how-section" id="how-it-works">
+
+        <div class="section-heading">
+            <span class="section-label">SIMPLE WORKFLOW</span>
+            <h2>How TabMind works</h2>
+            <p>Three simple steps to a more focused browsing experience.</p>
+        </div>
+
+        <div class="steps">
+
+            <div class="step">
+                <div class="step-number">01</div>
+                <h3>Set your goal</h3>
+                <p>Tell TabMind what you want to study, research or accomplish.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">02</div>
+                <h3>Analyse your tabs</h3>
+                <p>The Chrome extension sends your open tabs for AI-powered analysis.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">03</div>
+                <h3>Take control</h3>
+                <p>Review distractions, close selected tabs and explore your research insights.</p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="dashboard-section" id="dashboard">
+
+        <div class="section-heading">
+            <span class="section-label">YOUR WORKSPACE</span>
+            <h2>Welcome to your focus dashboard.</h2>
+            <p>Your latest TabMind AI analysis will appear here.</p>
+        </div>
+
+        <div class="dashboard-card">
+
+            <div class="dashboard-top">
+                <div>
+                    <h3>Focus Dashboard</h3>
+                    <p>Monitor your browsing productivity.</p>
+                </div>
+
+                <span class="status-badge">
+                    ● Ready
+                </span>
+            </div>
+
+            <div class="goal-box">
+                <label for="goal">WHAT ARE YOU WORKING ON?</label>
+
+                <input type="text" id="goal" placeholder="Example: Research artificial intelligence...">
+
+                <p class="hint">
+                    Enter your goal, then use the TabMind Chrome extension to analyse your open tabs.
+                </p>
+            </div>
+
+            <div class="dashboard-actions">
+                <button id="refreshButton" class="primary-button">
+                    Refresh Analysis ↻
+                </button>
+            </div>
+
+            <div id="analysisResults" class="results">
+
+                <div class="empty-state">
+                    <div>📊</div>
+                    <h3>Your analysis will appear here</h3>
+                    <p>Connect your Chrome extension and analyse your tabs to get started.</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <footer>
+        <div class="logo">
+            <span class="logo-icon">🧠</span>
+            <span>TabMind</span>
+        </div>
+
+        <p>Think clearly. Browse intelligently. Stay focused.</p>
+
+        <small>© 2026 TabMind. Built for smarter browsing.</small>
+    </footer>
+
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+
+</body>
+
+</html>

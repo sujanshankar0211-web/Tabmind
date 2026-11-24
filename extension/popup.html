@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TabMind</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header>
+            <div class="logo">🧠 TabMind</div>
+            <span class="status">● ACTIVE</span>
+        </header>
+
+        <div class="welcome">
+            <h1>Take control of your tabs.</h1>
+            <p>Focus smarter with AI-powered browsing.</p>
+        </div>
+
+        <div class="goal-section">
+            <label for="goal">YOUR FOCUS GOAL</label>
+
+            <textarea id="goal" placeholder="What are you working on today?"></textarea>
+        </div>
+
+        <div class="tab-count">
+            <span>🌐 Open browser tabs</span>
+            <strong id="tabCount">0</strong>
+        </div>
+
+        <button id="analyzeButton">
+            ✨ Analyse My Tabs
+        </button>
+
+        <div id="message" class="message">
+            Enter your goal and start analysing.
+        </div>
+
+        <div id="results" class="results hidden">
+
+            <h3>🎯 Analysis Results</h3>
+
+            <div id="summary"></div>
+
+            <h3>⚡ Distractions</h3>
+
+            <div id="distractions"></div>
+
+            <button id="closeButton" class="close-button hidden">
+                Close Selected Distractions
+            </button>
+
+        </div>
+
+        <footer>
+            Powered by Gemini AI
+        </footer>
+
+    </div>
+
+    <script src="popup.js"></script>
+
+</body>
+
+</html>
